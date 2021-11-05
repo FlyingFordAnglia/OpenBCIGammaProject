@@ -1,5 +1,3 @@
-% This function is a record of each protocol done on a subject.
-
 function [subjectNames,expDates,protocolNames,stimType,deviceName,capLayout,gender] = allProtocolsOBCIGammaProject
 clear index; index=1; deviceName{index} = 'OBCI'; subjectNames{index} = 'AD'; expDates{index} = '300321'; protocolNames{index} = 'GRF_001'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
 clear index; index=2; deviceName{index} = 'OBCI'; subjectNames{index} = 'AD'; expDates{index} = '300321'; protocolNames{index} = 'GRF_002'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
@@ -49,5 +47,41 @@ clear index; index=39; deviceName{index} = 'OBCI'; subjectNames{index} = 'SB'; e
 clear index; index=40; deviceName{index} = 'BP'; subjectNames{index} = 'SB'; expDates{index} = '210421'; protocolNames{index} = 'GRF_004'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
 clear index; index=41; deviceName{index} = 'BP'; subjectNames{index} = 'SB'; expDates{index} = '210421'; protocolNames{index} = 'GRF_005'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
 clear index; index=42; deviceName{index} = 'BP'; subjectNames{index} = 'SB'; expDates{index} = '210421'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+
+% clear index; index=43; deviceName{index} = 'BP'; subjectNames{index} = 'test'; expDates{index} = '160621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+% clear index; index=44; deviceName{index} = 'OBCI'; subjectNames{index} = 'test'; expDates{index} = '160621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+% 
+
+clear index; index=43; deviceName{index} = 'OBCI'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_001'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
+clear index; index=44; deviceName{index} = 'OBCI'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_002'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
+clear index; index=45; deviceName{index} = 'OBCI'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+clear index; index=46; deviceName{index} = 'BP'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_004'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
+clear index; index=47; deviceName{index} = 'BP'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_005'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
+clear index; index=48; deviceName{index} = 'BP'; subjectNames{index} = 'AB'; expDates{index} = '160621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+
+clear index; index=49; deviceName{index} = 'OBCI'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_001'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Open  
+clear index; index=50; deviceName{index} = 'OBCI'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_002'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Closed
+clear index; index=51; deviceName{index} = 'OBCI'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+clear index; index=52; deviceName{index} = 'BP'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_004'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Open  
+clear index; index=53; deviceName{index} = 'BP'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_005'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Closed
+clear index; index=54; deviceName{index} = 'BP'; subjectNames{index} = 'SVP'; expDates{index} = '220621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+
+clear index; index=55; deviceName{index} = 'BP'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_004'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
+clear index; index=56; deviceName{index} = 'BP'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_005'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
+clear index; index=57; deviceName{index} = 'BP'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+clear index; index=58; deviceName{index} = 'OBCI'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_001'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Open  
+clear index; index=59; deviceName{index} = 'OBCI'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_002'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'M';  % Eyes Closed
+clear index; index=60; deviceName{index} = 'OBCI'; subjectNames{index} = 'WS'; expDates{index} = '240621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'M';  % GRF protocol- SF-Ori
+
+clear index; index=61; deviceName{index} = 'OBCI'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_001'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Open  
+clear index; index=62; deviceName{index} = 'OBCI'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_002'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Closed
+clear index; index=63; deviceName{index} = 'OBCI'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+clear index; index=64; deviceName{index} = 'BP'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_004'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Open  
+clear index; index=65; deviceName{index} = 'BP'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_005'; capLayout{index} = 'OpenBCI19'; stimType{index} = 2; gender{index} = 'F';  % Eyes Closed
+clear index; index=66; deviceName{index} = 'BP'; subjectNames{index} = 'VS'; expDates{index} = '260621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+
+clear index; index=67; deviceName{index} = 'OBCI'; subjectNames{index} = 'test'; expDates{index} = '160621'; protocolNames{index} = 'GRF_003'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+clear index; index=68; deviceName{index} = 'BP'; subjectNames{index} = 'test'; expDates{index} = '160621'; protocolNames{index} = 'GRF_006'; capLayout{index} = 'OpenBCI19'; stimType{index} = 3; gender{index} = 'F';  % GRF protocol- SF-Ori
+
 
 end

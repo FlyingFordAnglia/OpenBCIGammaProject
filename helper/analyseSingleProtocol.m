@@ -1,18 +1,16 @@
-% This function analyses each protocol for a given subject.
-function [stPowerVsFreq,blPowerVsFreq,freqVals,tfPower,timeValsTF,freqValsTF,erp]=analyseSingleProtocol(eegData,timeVals,stRange,blRange,params,referenceType,analogChannelsStored,commonBadElecs,bipolarEEGChannels,protocolType)
-%The input arguments are these:
-% eegData: (array sized nElec * nTrials * timeVals)
-% timeVals: from lfpInfo.mat
-% stRange and blRange is the times for stimulus and baseline periods when stimulus is starting at t=0
-% params (optional) are the parameters for multitaper analysis.
-% referenceType: (string) unipolar OR bipolar
-% analogChannelsStored: from lfpInfo
-% commonBadElecs(optional): list of bad electrodes
-% bipolarEEGChannels: (list of lists) detailing which electrodes are part of the bipolar pairs
-% protocolType: (string) 'sfori' or 'notsfori'
+% This function takees the eeg data from one protocol and outputs the erp, power
+% vs frequency and time frequency spectral decomposition using multitaper
+% method
 
-if ~exist('stRange','var') || isempty(stRange); stRange = [0.1 0.95]; end
-if ~exist('blRange','var') || isempty(blRange); blRange = [-0.95 -0.1]; end
+function [stPowerVsFreq,blPowerVsFreq,freqVals,tfPower,timeValsTF,freqValsTF,erp]=analyseSingleProtocol(eegData,timeVals,stRange,blRange,params,referenceType,analogChannelsStored,commonBadElecs,bipolarEEGChannels,protocolType,badTrials)
+
+%The input arguments are these:
+%3. referenceType is a string: unipolar OR bipolar
+%5. bipolarEEGChannels is a list of lists detailing which electrodes are
+%   part of the bipolar pairs
+
+if ~exist('stRange','var') || isempty(stRange); stRange = [0.25 1.0]; end
+if ~exist('blRange','var') || isempty(blRange); blRange = [-0.75 -0]; end
 if ~exist('params','var'); params=[]; end
 if ~exist('bipolarEEGChannels','var') || isempty(bipolarEEGChannels)
     bipolarEEGChannels(1,:) = [3 4 8 6 7];
@@ -20,21 +18,19 @@ if ~exist('bipolarEEGChannels','var') || isempty(bipolarEEGChannels)
 end
 if ~exist('commonBadElecs','var'); commonBadElecs = []; end
 if ~exist('protocolType','var'); protocolType = 'sfori'; end
-
-Fs = round(1 / (timeVals(2) - timeVals(1)));  % sampling frequency for the EEG
-
-% get stimulus and baseline positions
-if round(diff(blRange) * Fs) ~= round(diff(stRange) * Fs)
+% Get stimulus and baseline indices
+Fs = round(1/(timeVals(2)-timeVals(1)));
+if round(diff(blRange)*Fs) ~= round(diff(stRange)*Fs)
     disp('baseline and stimulus ranges are not the same');
 else
     range = blRange;
-    rangePos = round(diff(range) * Fs);  % number of samples in bl/stRange
-    blPos = find(timeVals >= blRange(1),1) + (1:rangePos);  % positions for the baseline period
-    stPos = find(timeVals >= stRange(1),1) + (1:rangePos);  % positions for the stimulus period
+    rangePos = round(diff(range)*Fs);
+    blPos = find(timeVals>=blRange(1),1)+ (1:rangePos);
+    stPos = find(timeVals>=stRange(1),1)+ (1:rangePos);
 end
 
 
-% set multitaper parameters
+% Set Multitaper parameters
 if ~exist('params','var') || isempty(params)
     params.tapers   = [1 1];
     params.pad      = -1;
@@ -43,86 +39,107 @@ if ~exist('params','var') || isempty(params)
     params.trialave = 0;
 end
 
-movingwin = [0.32 0.032];  % to calculate t-f spectrogram (window size, step size)
+movingwin = [0.25 0.025]; % this is in seconds - gives 4Hz frequency resolution
 
 % removing bad electrodes
 unipolarEEGChannelsStored = setdiff(analogChannelsStored,commonBadElecs);
 badIndices = [];
-for i = commonBadElecs  % find all bipolar pairs where one of the electrodes is a bad electrode
+commonBadElecs = reshape(commonBadElecs,1,[]);
+for i = commonBadElecs
     badIndices = [badIndices find(bipolarEEGChannels(1,:)==i)];
     badIndices = [badIndices find(bipolarEEGChannels(2,:)==i)];
 end
 badIndices = unique(badIndices);
-bipolarEEGChannels =  bipolarEEGChannels(:, setdiff(1:5, badIndices));  % remove the bad pairs
-% high pass filtering (not needed)
-% Fc = 1;
-% [b,a] = butter(4,Fc/(Fs/2),'high');
+bipolarEEGChannels =  bipolarEEGChannels(:, setdiff(1:5, badIndices));
+% %High pass filtering
+% % Fc = 2;
+% % [b,a] = butter(5,Fc/(Fs/2),'high');
 
-%% get ERP, PSD and Time-Frequency spectrogram from eegData:
+% Get ERP, PSD and Time-Frequency spectrogram from eegData:
 
-% all the spectral powers are trial-wise, i.e. NOT averaged across trials or electrodes or SF Ori combinations;
+% All the spectral powers are trial-wise, i.e. NOT averaged across trials
+% or electrodes or SF Ori combinations;
 % ERP is for all trials, i.e. all 12 SF Ori combinations
-% TODO: remove bad trials for erp.
+%% unipolar
     if strcmpi(referenceType,'unipolar')
         for iElec = unipolarEEGChannelsStored
             clear analogData
             analogData = eegData(iElec,:,:);
-            analogData = squeeze(analogData);  % single electrode data
-            %analogData = filtfilt(b,a,analogData);  % only needed with high-pass filtering
+            analogData = squeeze(analogData);
+            %analogData = filtfilt(b,a,analogData);
             if strcmpi(protocolType,'sfori')
-                % correct for DC Shift (baseline correction)
-                erp(iElec,:) = mean((analogData - repmat(mean(analogData(:,blPos),2),1,size(analogData,2))),1); %#ok<*AGROW>
-                analogData = detrend(analogData);
-                [tfPower(iElec,:,:,:),timeValsTF0,freqValsTF] = mtspecgramc(analogData',movingwin,params);  % perform multitaper spectral analysis
-                timeValsTF = timeValsTF0 + timeVals(1);  % zero-centering (start of the stimulus at zero)
+
+                erp(iElec,:) = mean((analogData - repmat(mean(analogData(:,blPos),2),1,size(analogData,2))),1); %#ok<*AGROW> % Correct for DC Shift (baseline correction)
+                analogDataFlipped = detrend(analogData');
+                analogData = analogDataFlipped';
+                [tfPower(iElec,:,:,:),timeValsTF0,freqValsTF] = mtspecgramc(analogData',movingwin,params);
+                timeValsTF = timeValsTF0 + timeVals(1);
                 stPowerVsFreq(iElec,:,:)= mtspectrumc(squeeze(analogData(:,stPos))' ,params);
                 blPowerVsFreq(iElec,:,:)= mtspectrumc(squeeze(analogData(:,blPos))',params);
             
-                if ~isempty(analogData)  % perhaps not needed
+                if ~isempty(analogData)
                     [~,freqVals]= mtspectrumc(squeeze(analogData(1,stPos))',params);
                 else
                     [~,freqVals]= mtspectrumc(squeeze(analogData(:,stPos))',params);
                 end
             else
                 analogData = detrend(analogData);
-                stPowerVsFreq(iElec,:,:) = mtspectrumc(analogData',params);
+                stPowerVsFreq(iElec,:,:)= mtspectrumc(analogData',params);
                 [~,freqVals] = mtspectrumc(analogData',params);
-                blPowerVsFreq = [];  % these parameters are not needed in non SFOri protocols
-                timeValsTF = [];
+                blPowerVsFreq = [];
+                timeValsTF =[];
                 tfPower = [];
-                freqValsTF = [];
-                erp = [];
+                freqValsTF =[];
+                erp =[];
             end
         end
 
     end    
+
+%% bipolar
 
     if strcmpi(referenceType,'bipolar')
         for iElec = 1:length(bipolarEEGChannels)
             clear electrode1 electrode2
             electrode1 = eegData(bipolarEEGChannels(1,iElec),:,:);
             electrode2 = eegData(bipolarEEGChannels(2,iElec),:,:);
-            bipolarAnalogData = electrode1 - electrode2;
-            bipolarAnalogData = squeeze(bipolarAnalogData);
-
+            bipolarAnalogData = squeeze((electrode1)-(electrode2));
+            
+            % sfori
             if strcmpi(protocolType,'sfori')
-                % most of the code is same as in the unipolar case
-                erp(iElec,:) = mean((bipolarAnalogData - repmat(mean(bipolarAnalogData(:,blPos),2),1,size(bipolarAnalogData,2))),1);
-                bipolarAnalogData = detrend(bipolarAnalogData);
-                %bipolarAnalogData = filtfilt(b,a,bipolarAnalogData); % needed for highpass only
+                % removing bad trials
+                badtrialSubtractedBipolarAnalogData = (bipolarAnalogData(setdiff(1:size(bipolarAnalogData,1),badTrials),:));
+                erp(iElec,:) = mean((badtrialSubtractedBipolarAnalogData - repmat(mean(badtrialSubtractedBipolarAnalogData(:,blPos),2),1,size(badtrialSubtractedBipolarAnalogData,2))),1); % Correct for DC Shift (baseline correction)
+                
+                %linear detrending after erp. If linear detrending is 
+                %not done, the large slow drifts cause large spectral 
+                %leakage at low frequencies dominating the signal
+                bipolarAnalogDataFlipped = detrend(bipolarAnalogData');
+%               bipolarAnalogDataFlipped = locdetrend(bipolarAnalogData',Fs,[0.25 0.025]); %linear detrending after erp. If linear detrending is not done, the large slow drifts cause multitaper to malfunction weirdly
+                bipolarAnalogData = bipolarAnalogDataFlipped';
+                %bipolarAnalogData = filtfilt(b,a,bipolarAnalogData); % highpass
+                
+                %TF spectra
                 [tfPower(iElec,:,:,:),timeValsTF0,freqValsTF] = mtspecgramc(bipolarAnalogData',movingwin,params);
-                timeValsTF = timeValsTF0 + timeVals(1);
+                timeValsTF = timeValsTF0 + timeVals(1); % centering the stimulus onset at 0
+                
+                % PSD
                 stPowerVsFreq(iElec,:,:)= mtspectrumc(squeeze(bipolarAnalogData(:,stPos))',params);
                 blPowerVsFreq(iElec,:,:)= mtspectrumc(squeeze(bipolarAnalogData(:,blPos))',params);
+        %          freqVals = 0:1/diff(blRange):Fs;
+        %          stPowerVsFreq(elec,:,:)= abs(fft(squeeze(bipolarAnalogData(:,stPos))'));
+        %          blPowerVsFreq(elec,:,:)= abs(fft(squeeze(bipolarAnalogData(:,blPos))'));
 
                 if ~isempty(bipolarAnalogData)
                     [~,freqVals]= mtspectrumc(squeeze(bipolarAnalogData(1,stPos))',params);
                 else
                     [~,freqVals]= mtspectrumc(squeeze(bipolarAnalogData(:,stPos))',params);
                 end
-            else
-                bipolarAnalogData = detrend(bipolarAnalogData);
-
+            else % eye open eye closed protocols
+                bipolarAnalogDataFlipped = detrend(bipolarAnalogData');%linear detrending after erp. If linear detrending is not done, the large slow drifts cause multitaper to malfunction weirdly
+%                 bipolarAnalogDataFlipped = locdetrend(bipolarAnalogData',Fs,[0.25 0.025]); %linear detrending after erp. If linear detrending is not done, the large slow drifts cause multitaper to malfunction weirdly
+                bipolarAnalogData = bipolarAnalogDataFlipped';
+                
                 stPowerVsFreq(iElec,:,:)= mtspectrumc(bipolarAnalogData',params);
                 [~,freqVals] = mtspectrumc(bipolarAnalogData',params);
                 blPowerVsFreq = [];

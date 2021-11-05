@@ -1,5 +1,3 @@
-% This code is the same as extractDigitalDataBrainProducts.m except for the file-name format
-
 % This function is used to extract the digital data from raw brain products
 % data files (.eeg, .vhdr, .vmrk)
 

@@ -1,8 +1,8 @@
 % This is the main program used to find bad trials in EEG data.
 
-% Note: This program is a slightly modified version of findBadTrialsWithEEG.m 
-% compatible with OpenBCI data format and MonkeyLogic behavioural file.
-% Eye data extraction from MonkeyLogic file is also added.
+% Note: This program was built on top of findBadTrialsEEG_GAV_v2 to _v5.
+% This program was used for finding bad trials for 350 subjects who were
+% part of ADGammaProject (DVPS Murty et al. 2021).
 
 % badEEGElectrodes: set of EEG electrodes deemed bad from the beginning and not used for any further analysis. 
 % nonEEGElectrodes are other analog electrodes that are not considered for bad trial analysis
@@ -12,7 +12,7 @@ function [badTrials,allBadTrials,badTrialsUnique,badElecs,totalTrials,slopeValsV
 
 % if ~exist('gridType','var');        gridType = 'EEG';                   end
 % if ~exist('badEEGElectrodes','var');  badEEGElectrodes = [];            end
-% if ~exist('nonEEGElectrodes','var');  nonEEGElectrodes = [8];       end
+% if ~exist('nonEEGElectrodes','var');  nonEEGElectrodes = [];       end
 % if ~exist('impedanceTag','var');    impedanceTag = 'ImpedanceStart';    end
 % if ~exist('capType','var');         capType = 'actiCap64';              end
 % if ~exist('saveDataFlag','var');    saveDataFlag = 1;                   end
@@ -25,7 +25,7 @@ checkPeriod = [-0.5 0.75]; % s
 ImpedanceCutOff = 25; % KOhm
 time_threshold  = 6;
 psd_threshold = 6;
-badTrialThreshold = 40; % Percentage
+badTrialThreshold = 40; % Percentage of bad trials for an electrode to be marked noisy
 
 tapersPSD = 1; % No. of tapers used for computation of slopes
 slopeRange = {[56 86]}; % Hz, slope range used to compute slopes
@@ -69,17 +69,12 @@ else
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Get Impedance data %%%%%%%%%%%%%%%%%%%%%%%%
-
 [elecImpedanceLabels,elecImpedanceValues] = getImpedanceDataOBCI(subjectName,expDate,folderSourceString);
 disp('Impedance Data loaded');
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Get Eye data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 [eyeDataDeg,eyeRangeMS,FsEye] = getEyeDataML(folderName);
 disp('Eye Data loaded');
-
 %%%%%%%%%%%%%%%%%%%%%%%% Set up MT parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 Fs = 1/(timeVals(2) - timeVals(1)); %Hz
 
 params.tapers   = [3 5];
@@ -89,7 +84,6 @@ params.fpass    = [0 200];
 params.trialave = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Bad Trial Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % 1. Get bad trials from eye data
 if exist('FsEye','var') && ~isempty(FsEye)
     badEyeTrials = findBadTrialsFromEyeData_v2(eyeDataDeg,eyeRangeMS,FsEye,checkPeriod)'; % added by MD 10-09-2017; Modified by MD 03-09-2019
@@ -267,23 +261,20 @@ for iTrial = 1:length(newBadTrials)
 end
 newBadTrials(badTrialElecs<(badElecThreshold/100.*numElectrodes))=[];
 end
-
-% eye-data extraction from MonkeyLogic file (bhv2)
-
 function [eyeData,eyeRangeMS,FsEye] = getEyeDataML(folderName)
 
 dataFile = fullfile(folderName, 'extractedData', 'ML.mat');
 dataMain = load(dataFile, 'data');
 eyeData = struct('eyeDataDegX', [], 'eyeDataDegY', []);
-FsEye = 1000; %sampling frequency of eye tracker
-FixationDurationMS = 1000; % hold fixation duration
-StimDurationMS = 1000; % stimulus duration
+FsEye = 1000;
+FixationDurationMS = 1000;
+StimDurationMS = 1000;
 eyeRangeMS = [-FixationDurationMS, StimDurationMS];
 eyeTrackDuration = FixationDurationMS + StimDurationMS;
 for i=1:length(dataMain.data)
     if dataMain.data(1, i).TrialError == 0
-        t1 = dataMain.data(1, i).AnalogData.Eye((end - eyeTrackDuration):end, 1)';
-        t2 = dataMain.data(1, i).AnalogData.Eye((end - eyeTrackDuration):end, 2)';
+        t1 = dataMain.data(1, i).AnalogData.Eye((end-eyeTrackDuration):end, 1)';
+        t2 = dataMain.data(1, i).AnalogData.Eye((end-eyeTrackDuration):end, 2)';
         eyeData.eyeDataDegX = [eyeData.eyeDataDegX; t1];
         eyeData.eyeDataDegY = [eyeData.eyeDataDegY; t2];
     end

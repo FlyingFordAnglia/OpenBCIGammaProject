@@ -11,13 +11,13 @@
 
 function [digitalTimeStamps, digitalEvents]=extractDigitalDataOBCINoiseFiltered(subjectName,expDate,protocolName,folderSourceString,gridType,deltaLimit)
 
-% Currently the OpenBCI board is assumed to be running at 250Hz Sampling (without Daisy,
+% Currently the OpenBCI is assumed to be running at 250Hz Sampling (without Daisy,
 % with Bluetooth Adaptor)
 % The digital code circuit is assumed to keep the code persistant after updating
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% minimum inter-event-code difference below which they are removed as transition codes
-if ~exist('deltaLimitMS','var');  deltaLimit = 0.005; end %deltaLimit is in milliseconds                 
+
+if ~exist('deltaLimitMS','var');  deltaLimit = 0.005; end %deltaLimit is in seconds                 
 
 
 fileName = [subjectName expDate protocolName];
@@ -34,9 +34,9 @@ eegData = readtable(fullfile(folderIn, fileName), 'HeaderLines', 4, 'ReadVariabl
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%% Digital Codes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-decimalEventCodes = convertFromBinary(eegData); % binary format -> integers
-[digitalTimeStamps, digitalEvents] = findEventCodeChanges(decimalEventCodes); % finding the event-code changes
-goodCodePositions = removeTransitionCodes(digitalTimeStamps, deltaLimit); % filter transition codes
+decimalEventCodes=convertFromBinary(eegData);
+[digitalTimeStamps, digitalEvents] = findEventCodeChanges(decimalEventCodes);
+goodCodePositions = removeTransitionCodes(digitalTimeStamps, deltaLimit);
 digitalEvents = digitalEvents(goodCodePositions);
 digitalTimeStamps = digitalTimeStamps(goodCodePositions);
 disp(['Total Digital Events: ' num2str(length(digitalEvents))]);
@@ -46,12 +46,12 @@ end
 % To convert binary-represented digital pin signals to a decimal number
 function [newCodes]=convertFromBinary(eegData)
 newCodes = transpose(eegData{:, 14} * 16 + eegData{:, 15} * 8 + eegData{:, 16} * 4 + eegData{:, 17} * 2 + eegData{:, 19});
-%Column 18 is a list of zeroes and does not store any information (as there are only 5 digital pins in OpenBCI)
+%Column 18 is a list of zeroes and does not store any information
 end
 
-%To extract the timestamps (relative to the start) and the corresponding Event codes
+%To extract the timestamps (relative to the start) and the Event codes
 %OpenBCI does not send any timestamps from the Cyton Board. The sampling is
-%assumed to be constant and timestamps are generated here using the expected 4ms gap
+%assumed to be constant and timestamps are generated here using 4ms gap
 %between packets of data.
 
 function [digitalTimeStamps, digitalEvents]=findEventCodeChanges(decimalEventCodes)
@@ -66,6 +66,6 @@ end
 function [goodCodePosition] = removeTransitionCodes(digitalTimeStamps, deltaLimit)
 
 diffDT = diff(digitalTimeStamps);
-goodCodePosition = [not(diffDT<=deltaLimit) true]; % always keep the last code entry
+goodCodePosition = [not(diffDT<=deltaLimit) true];
 
 end

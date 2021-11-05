@@ -1,0 +1,13 @@
+Condition	Info	Frequency	Block	Timing File	TaskObject#1	TaskObject#2
+1	'sf',1,'ori',0	1	1	timing_script_1	fix(0,0)	pic('sf1ori0.png',0,0)
+2	'sf',1,'ori',45	1	1	timing_script_1	fix(0,0)	pic('sf1ori45.png',0,0)
+3	'sf',1,'ori',90	1	1	timing_script_1	fix(0,0)	pic('sf1ori90.png',0,0)
+4	'sf',1,'ori',135	1	1	timing_script_1	fix(0,0)	pic('sf1Ori135.png',0,0)
+5	'sf',2,'ori',0	1	1	timing_script_1	fix(0,0)	pic('sf2ori0.png',0,0)
+6	'sf',2,'ori',45	1	1	timing_script_1	fix(0,0)	pic('sf2ori45.png',0,0)
+7	'sf',2,'ori',90	1	1	timing_script_1	fix(0,0)	pic('sf2ori90.png',0,0)
+8	'sf',2,'ori',135	1	1	timing_script_1	fix(0,0)	pic('sf2ori135.png',0,0)
+9	'sf',4,'ori',0	1	1	timing_script_1	fix(0,0)	pic('sf4ori0.png',0,0)
+10	'sf',4,'ori',45	1	1	timing_script_1	fix(0,0)	pic('sf4ori45.png',0,0)
+11	'sf',4,'ori',90	1	1	timing_script_1	fix(0,0)	pic('sf4ori90.png',0,0)
+12	'sf',4,'ori',135	1	1	timing_script_1	fix(0,0)	pic('sf4ori135.png',0,0)

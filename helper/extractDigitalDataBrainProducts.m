@@ -27,7 +27,7 @@ function [digitalTimeStamps,digitalEvents]=extractDigitalDataBrainProducts(subje
 
 % We only consider codes that are separated by at least deltaLimit ms to make sure
 % that none of the codes are during the transition period.
-if ~exist('deltaLimitMS','var');    deltaLimitMS = 3;                   end
+if ~exist('deltaLimitMS','var');    deltaLimitMS = 5;                   end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fileName = [subjectName expDate protocolName '.vhdr'];

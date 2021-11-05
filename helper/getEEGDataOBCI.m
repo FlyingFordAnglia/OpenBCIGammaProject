@@ -1,14 +1,15 @@
 % This program extracts EEG data from the raw output of the OpenBCI GUI
 % and stores the data in specified folders.
 
-% This function is run inside runExtractAllProtocolsOBCIGammaProject.m
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% This program needs the following matlab files
+% makeDirectory.m
 
 
 function getEEGDataOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,goodStimTimes,timeStartFromBaseLine,deltaT,electrodeLabels)
-
+% Currently the OpenBCI is assumed to be running at 250Hz Sampling (without Daisy,
+% with Bluetooth Adaptor)
+% The digital code circuit is assumed to keep the code persistant after updating
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Fs = 250;  % 250Hz without Daisy, 125Hz with Daisy
@@ -27,11 +28,11 @@ analogInputNums = 1:8;
 %%%%%%%%%%%%%%%%%%%%%%%%%% EEG Decomposition %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-analysisOnsetTimes = goodStimTimes + timeStartFromBaseLine; % the times where stimulus began
-times = 0.004 * (1:height(eegData)); % assuming the perfect 250Hz sampling frequency because OBCI does not give timestamps
+analysisOnsetTimes = goodStimTimes + timeStartFromBaseLine;
+times = 0.004 * (1:height(eegData)); % assuming the perfect 250Hz sampling frequency
 
 % Set appropriate time Range
-numSamples = deltaT * Fs; % number of samples in the duration of each segment (trial length)
+numSamples = deltaT * Fs;
 timeVals = timeStartFromBaseLine + (1/Fs:1/Fs:deltaT);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,7 +47,6 @@ makeDirectory(outputFolder);
 % Now segment and store data in the outputFolder directory
 totalStim = length(analysisOnsetTimes);
 goodStimPos = zeros(1,totalStim);
-
 for i=1:totalStim
 	goodStimPos(i) = find(times>analysisOnsetTimes(i),1);
 end

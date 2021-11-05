@@ -1,12 +1,8 @@
+% This program is identical to saveMLData.m except for appropriate file path change 
 % This program reads and saves data from MonkeyLogic. It has a similar
 % function as saveLLData that reads from the Lablib data file. However,
 % this program is much simpler because ML is run in a very simple way, as
 % explained below:
-
-% ML is used mainly for auditory or meditation experiments. Therefore, the
-% subjects do not do any task. Even if they have to do a fixation task, the
-% eyes are tracked and the out-of-fixation trials are rejected offline
-% later. Therefore, all stimuli are used.
 
 function ML = saveMLDataNoiseFiltered(subjectName,expDate,protocolName,folderSourceString,gridType,folderDestinationString)
 

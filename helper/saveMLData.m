@@ -3,10 +3,6 @@
 % this program is much simpler because ML is run in a very simple way, as
 % explained below:
 
-% ML is used mainly for auditory or meditation experiments. Therefore, the
-% subjects do not do any task. Even if they have to do a fixation task, the
-% eyes are tracked and the out-of-fixation trials are rejected offline
-% later. Therefore, all stimuli are used.
 
 function ML = saveMLData(subjectName,expDate,protocolName,folderSourceString,gridType,folderDestinationString)
 

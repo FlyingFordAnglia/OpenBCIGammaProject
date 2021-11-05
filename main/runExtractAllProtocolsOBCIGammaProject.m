@@ -1,32 +1,13 @@
-% This program takes in rawData (files from BrainProducts, OpenBCI and
-% MonkeyLogic) and extracts and segments the rawData and saves it in the
-% data folder for each subject.
-% Three protocols are recorded using OpenBCI and BrainProducts each.
-% 1. Eye Open - GRF_001 and GRF_004
-% 2. Eye Closed - GRF_002 and GRF_005
-% 3. Sf-Ori - GRF_003 and GRF_006
-
-
-
+clear;
 gridType='EEG'; 
+folderSourceString='C:\Users\srivi\Desktop\updated_codes281021';
+folderOutString='C:\Users\srivi\Desktop\updated_codes281021';
 
-% folderSourceString is the directory where the 'data' folder is located.
-
-folderSourceString='C:\Users\srivi\Desktop\updated_codes_010621\new';
-folderOutString='C:\Users\srivi\Desktop\updated_codes_010621\new';
-
-% allProtocolsOBCIGammaProject has an index wise listing of the experiment
-% details.
 [subjectNames,expDates,protocolNames,stimTypes,deviceNames,capLayouts] = allProtocolsOBCIGammaProject;
-
-electrodeLabels = ["O1","O2","T5","P3","Pz","P4","T6","Ref"]; % according to the 10-20 international system
-
-% the indices of protocols you want to extract
-extractTheseIndices = 13:18; % This is for subject 3.
-
-Fs = 250; % sampling frequency of EEG recording - OBCI and BP
-
-for iProt = 1:length(extractTheseIndices) % for each protocol
+electrodeLabels = ["O1","O2","T5","P3","Pz","P4","T6","Ref"];
+extractTheseIndices = 1:68; % choose the protocol numbers you want to extract from allProtocolsOBCIGammaProject;
+Fsampling = 250; % sampling frequency
+for iProt = 1:length(extractTheseIndices)
     
     subjectName = subjectNames{extractTheseIndices(iProt)};
     expDate= expDates{extractTheseIndices(iProt)};
@@ -37,8 +18,7 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
     %% Eye open and eye closed data for OpenBCI
     clear eegData
     if strcmpi(protocolName,'GRF_001') || strcmpi(protocolName,'GRF_002')
-	
-		% prepare folders
+        Fs = Fsampling;
         fileName = [subjectName expDate protocolName];
         folderName = fullfile(folderSourceString,'data',subjectName,gridType,expDate,protocolName);
         makeDirectory(folderName);
@@ -50,7 +30,7 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
         % use readtable MATLAB function to read the code
         eegData = readtable(fullfile(folderIn, fileName), 'HeaderLines', 4, 'ReadVariableNames', 1);
         
-        analogInputNums = 1:8; % 8 electrodes
+        analogInputNums = 1:8;
         disp(['Total number of Analog channels recorded: ' num2str(length(analogInputNums))]);
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,7 +41,7 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
         analysisOnsetTimes = 3:1:analysisTimeToBeUsed-1; %goodStimTimes + timeStartFromBaseLine; 
         %starting from 3rd second to remove starting artefacts from
         %recording
-        times = 0.004 * (1:height(eegData)); % This is in milliseconds
+        times = 0.004 * (1:height(eegData)); % This is in seconds
         deltaT = 1.000; % in seconds;
         
         if (~isempty(analogInputNums))
@@ -88,13 +68,13 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
             
             for i=1:8
                 disp(['elec' num2str(analogInputNums(i))]);
-					
+                
                 clear analogData
                 analogData = zeros(totalStim,numSamples);
                 for j=1:totalStim
                     analogData(j,:) = eegData{goodStimPos(j)+1:goodStimPos(j)+numSamples,i+1};
                 end
-                analogInfo = struct('label', electrodeLabels(i)); %#ok<*NASGU>
+                analogInfo = struct('label', electrodeLabels(i)); 
                 save(fullfile(outputFolder,['elec' num2str(analogInputNums(i)) '.mat']),'analogData','analogInfo');
             end
             
@@ -117,9 +97,8 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
         folderExtract = fullfile(folderName,'extractedData');
         makeDirectory(folderExtract);
         
-        % Following code is adapted from getEEGDataBrainProducts under
-        % LabCommonPrograms
-        % (Programs/CommonPrograms/ReadData/getEEGDataBrainProducts
+        % Following code is adapted from 
+        % github.com/supratimray/CommonPrograms/blob/master/ReadData/getEEGDataBrainProducts.m
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,10 +164,8 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
     end
     
     %% SF-ORI protocol for OpenBCI
-
         if strcmpi(protocolName,'GRF_003')
-			%based on stimulus type, we can select how we want to segment the data 
-			% i.e. how much time before the stim onset to how much time after
+            % defining different segment times around stimulus onset 0.
             timeStartFromBaseLineList(1) = -0.55; deltaTList(1) = 1.024; % in seconds
             timeStartFromBaseLineList(2) = -1.148; deltaTList(2) = 2.048;
             timeStartFromBaseLineList(3) = -1.5; deltaTList(3) = 4.096;
@@ -196,11 +173,9 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
             type = stimTypes{extractTheseIndices(iProt)};
             deltaT = deltaTList(type);
             timeStartFromBaseLine = timeStartFromBaseLineList(type);
-            
             ML = saveMLData(subjectName,expDate,protocolName,folderSourceString,gridType);
             
-            % Extract the trial error codes (the codes which indicate whether fixation was 
-            % broken or not) from the saved ML data
+            % Extract the trial error codes from the saved ML data
             folderName = fullfile(folderSourceString,'data',subjectName,gridType,expDate,protocolName);
             folderExtract = fullfile(folderName,'extractedData');
             trialError = load(fullfile(folderExtract,'ML.mat'), 'data');
@@ -209,10 +184,10 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
             for i=1:length(trialError)
                 trialErrorCodes(i) = trialError(i).TrialError;
             end	
-            % Read digital data from OpenBCI
+            % Read digital data from BrainProducts
             [digitalTimeStamps,digitalEvents]=extractDigitalDataOBCI(subjectName,expDate,protocolName,folderSourceString,gridType);
 
-            % Compare ML behavior and OBCI files
+            % Compare jitter between ML times and OBCI times
             if ~isequal(ML.allCodeNumbers,digitalEvents)
                 error('Digital and ML codes do not match');
             else
@@ -225,22 +200,22 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
 
                 subplot(212);
                 plot(1000*diff(digitalTimeStamps)-diff(ML.allCodeTimes));
-                ylabel('Difference in ML and OBCI code times (ms)');
+                ylabel('Difference in ML and BP code times (ms)');
                 xlabel('Event Number');
 
-                % Stimulus Onset (digital event marker = 9)
+                % Stimulus Onset
                 stimPos = find(digitalEvents==9);
-                stimPosCorrectedTrials = stimPos(trialErrorCodes==0); %only the trials with trialErrorCode=0 are correct trials.
-                goodStimTimes = digitalTimeStamps(stimPos+1); % the digital event after the trial start event is the one that marks the stimulus onset
+                stimPosCorrectedTrials = stimPos(trialErrorCodes==0);
+                goodStimTimes = digitalTimeStamps(stimPos+1); % digital code 9 marks start of trial, and the following digital code marks start of stimulus
                 goodStimTimesCorrectedTrials = digitalTimeStamps(stimPosCorrectedTrials+1);
                 stimNumbers = digitalEvents(stimPos+1);
                 stimNumbersCorrectedTrials = digitalEvents(stimPosCorrectedTrials+1);
             end
 
-            StartPos = find(digitalEvents==9);
-            startTimes = digitalTimeStamps(StartPos);
-            EndPos = find(digitalEvents==18);
-            endTimes = digitalTimeStamps(EndPos);
+%             StartPos = find(digitalEvents==9);
+%             startTimes = digitalTimeStamps(StartPos);
+%             EndPos = find(digitalEvents==18);
+%             endTimes = digitalTimeStamps(EndPos);
 
 %             folderStringName = fullfile(folderSourceString,'AnalysisDetails',subjectName,expDate,protocolName,'Analysis');
 %             makeDirectory(folderStringName);
@@ -254,8 +229,10 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
             save(fullfile(folderExtract,'digitalEvents.mat'),'digitalTimeStamps','digitalEvents');
 
             getEEGDataOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,goodStimTimesCorrectedTrials,timeStartFromBaseLine,deltaT,electrodeLabels);
-            findBadTrialsWithOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,[],[],[],1,'_v5',0) %creates a bad trial file in segmentedData folder
-
+            
+            if iProt < 67   % no need to see bad trials in shorted electrodes
+                findBadTrialsWithOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,[],[],[],1,'_v5',0)
+            end
         end
     
     %% SF-ORI protocol for BrainProducts
@@ -298,17 +275,17 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
             % Stimulus Onset
             stimPos = find(digitalEvents==9);
             stimPosCorrectedTrials = stimPos(trialErrorCodes==0);
-            goodStimTimes = digitalTimeStamps(stimPos+1);
+            goodStimTimes = digitalTimeStamps(stimPos+1);% digital code 9 marks start of trial, and the following digital code marks start of stimulus
             goodStimTimesCorrectedTrials = digitalTimeStamps(stimPosCorrectedTrials+1);
             stimNumbers = digitalEvents(stimPos+1);
             stimNumbersCorrectedTrials = digitalEvents(stimPosCorrectedTrials+1);
         end
 
-        StartPos = find(digitalEvents==9);
-        startTimes = digitalTimeStamps(StartPos);
-        EndPos = find(digitalEvents==18);
-        endTimes = digitalTimeStamps(EndPos);
-
+%         StartPos = find(digitalEvents==9);
+%         startTimes = digitalTimeStamps(StartPos);
+%         EndPos = find(digitalEvents==18);
+%         endTimes = digitalTimeStamps(EndPos);
+% 
 %         folderStringName = fullfile(folderSourceString,'AnalysisDetails',subjectName,expDate,protocolName,'Analysis');
 %         makeDirectory(folderStringName);
 %         save(fullfile(folderStringName,'startTimes.mat'),'startTimes');
@@ -321,9 +298,9 @@ for iProt = 1:length(extractTheseIndices) % for each protocol
         getDisplayCombinationsGRF(folderExtract,goodStimNums); % Generates parameterCombinations
         getEEGDataBrainProducts(subjectName,expDate,protocolName,folderSourceString,gridType,goodStimTimesCorrectedTrials,timeStartFromBaseLine,deltaT);
 
-
-        findBadTrialsWithOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,[],[],[],1,'_v5',0)
-
+        if iProt < 67   % no need to see bad trials in shorted electrodes
+            findBadTrialsWithOBCI(subjectName,expDate,protocolName,folderSourceString,gridType,[],[],[],1,'_v5',0)
+        end
     end
     
     

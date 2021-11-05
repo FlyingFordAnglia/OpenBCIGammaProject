@@ -22,7 +22,7 @@ parameters{3} = 'sigma';
 parameters{4} = 'spatialFrequency';
 parameters{5} = 'orientation';
 parameters{6} = 'contrast';
-parameters{7} = 'temporalFrequency'; %#ok<NASGU>
+parameters{7} = 'temporalFrequency'; 
 
 % get Contrast
 aValsAll  = stimResults.azimuth;

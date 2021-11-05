@@ -1,4 +1,7 @@
-% This program takes the stimulus numbers (1-12) and gives out values which indicate which SF and Ori type each stimulus belongs to.
+% This function converts the 1-D digital codes for all the 12 stimuli (19:30)
+% into 2-D codes with orientation (0,1,2,3) and spatial frequency
+% (0,1,2) components based on the sequence in which they are saved in the
+% monkeylogic conditions file.
 
 function getStimResultsMLOBCI(folderExtract,stimNumbers)
 

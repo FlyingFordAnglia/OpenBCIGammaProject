@@ -1,5 +1,3 @@
-% This program is identical to getEEGDataBrainProducts.m except for the file-name directory
-
 % This program extracts EEG data from the raw (.eeg, .vhdr, .vmrk) files
 % and stores the data in specified folders. The format is the same as for Blackrock data.
 
@@ -26,50 +24,9 @@ makeDirectory(folderExtract);
 
 % use EEGLAB plugin "bva-io" to read the file
 eegInfo = pop_loadbv(folderIn,fileName,[],[]);
-segmentLength = 20;
 Fs = eegInfo.srate;
 
-for iElec = 1:8
-    rawData = eegInfo.data(iElec,:);
-    counter = 1;
-    while counter < length(rawData)
-        if (counter + (segmentLength*Fs)) <= length(rawData)
-            segmentIndices = counter : (counter + (segmentLength*Fs) - 1);
-        else
-            segmentIndices = counter : length(rawData);
-        end
-%         disp('segmentIndices');
-%         disp([segmentIndices(1) segmentIndices(end)]);
-        segmentToBeNoiseCorrected = rawData(segmentIndices);
-        fftX = fft(segmentToBeNoiseCorrected);
-        absfftX = abs(fftX);
-        freqVals = 0:1/(length(segmentIndices)/Fs):Fs-1/(length(segmentIndices)/Fs); 
-        freqPos = find(freqVals>20 & freqVals<125);
-        maxPos = find(absfftX==max(absfftX(freqPos)));
-%         disp('maxFreq');
-%         disp(freqVals(maxPos));
-        fftNX = zeros(1,length(fftX));
-        fftNX(maxPos) = fftX(maxPos);
-        noiseSignal = ifft(fftNX);
-        noiseCorrectedSegment = segmentToBeNoiseCorrected - noiseSignal;
-        rawData(segmentIndices) = noiseCorrectedSegment;
-%         figure();
-%         fig1 = subplot(1,2,1);
-%         plot(fig1,segmentToBeNoiseCorrected);
-%         hold on;
-%         plot(fig1,noiseCorrectedSegment);
-%         legend(fig1,'old','new');
-%         fig2 = subplot(1,2,2);
-%         plot(fig2,freqVals,log10(abs(fftX)));
-%         hold on;
-%         plot(fig2,freqVals,log10(abs(fft(noiseCorrectedSegment))))
-%         pause;
-        counter = counter + (segmentLength*Fs) - 1;
-        %disp(['counter: ' num2str(counter)])
-
-    end
-    eegInfo.data(iElec,:) = rawData;
-end
+[eegInfo.data] = correctMainsNoiseBP(eegInfo,180,Fs);
 cAnalog = eegInfo.nbchan;
 analogInputNums = 1:cAnalog;
 disp(['Total number of Analog channels recorded: ' num2str(cAnalog)]);
