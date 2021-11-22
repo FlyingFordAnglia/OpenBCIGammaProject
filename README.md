@@ -2,7 +2,7 @@ This folder contains all segmented data (see below) pertinent to the OpenBCI_Gam
 
 ### Data format:
 
-1. **Raw Data**: as obtained directly from the EEG recording systems ([OpenBCI](https://openbci.com/) and [BrainProducts](https://www.brainproducts.com/)) and the stimulus presenting software ([MonkeyLogic](https://monkeylogic.nimh.nih.gov/)). The data for each subject is stored in a separate folder inside the directory `data/rawData`.
+1. **Raw Data**: as obtained directly from the EEG recording systems ([OpenBCI](https://openbci.com/) and [BrainProducts](https://www.brainproducts.com/)) and the stimulus presenting software ([MonkeyLogic](https://monkeylogic.nimh.nih.gov/)). The data for each subject is stored in a separate folder inside the directory `data/rawData`. Currently, the raw data of only one subject has been added as an example. All the analyses from our study can be replicated using only segmented data (see below).
 2. **Segmented data**: Segments of data around the stimulus onset are extracted and saved from Raw Data. The data for each subject is stored in a separate folder inside the directory `data`. Each protocol for every subject has the following subfolders:
     2a. `extractedData`: this contains para-EEG data like monkeylogic data and digital events data.
     2b. `segmentedData`: this contains electrode wise data for each protocol and some auxiliary information in lfpInfo.mat.
