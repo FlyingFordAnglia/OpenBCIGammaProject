@@ -12,7 +12,7 @@ alphaRange = [8 13];
 slowGammaRange = [20 34];
 fastGammaRange = [35 66];
 
-fontsize = 10;
+fontsize = 12;
 tickdir = 'out';
 ticklength = [0.03 0];
 
@@ -31,7 +31,11 @@ deltaPVsFreqBPAllSub = [];
 subjects = 1:length(allSubjectDataNoiseFiltered);
 [subjectNames,expDates,protocolNames,stimTypes,deviceNames,capLayouts,gender] = allProtocolsOBCIGammaProject;
 allSubjects = unique(subjectNames);
-
+annotation('textbox', [0.065,0.94,0.04,0.045], 'String', "A", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.5,0.94,0.04,0.045], 'String', "B", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.065,0.48,0.04,0.045], 'String', "C", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.5,0.48,0.04,0.045], 'String', "D", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+rng(2021);
 %subjects = [1 3 6];
 for iSub = subjects
     x = protocolNames(contains(subjectNames,allSubjects(iSub)));
@@ -109,7 +113,7 @@ DPSDcrossCorrMeans = median(DPSDcrossCorr, 2);
 DPSDcrossCorrFlat = reshape(DPSDcrossCorr.', 1, []);
 
 
-fig1 = subplot(4,2,1);
+fig1 = subplot(2,2,1);
 for i=subjects
     scatter(fig1, repmat(DPSDselfCorr(i),1,iSub - 1),DPSDcrossCorr(i,:),'k','filled','MarkerFaceColor','k','MarkerFaceAlpha',0.15)
     hold on
@@ -121,39 +125,42 @@ hold on;
 xlim([0 1]);
 ylim([0 1]);
 plot([0 1], [0 1],'color','#aa3700','linewidth',0.5);
-xticks([]);
-xticklabels([]);
-ylabel('Change in Power');
+xticks([0,0.5,1]);
+xticklabels([0,0.5,1]);
+yticks([0,0.5,1]);
+yticklabels([0,0.5,1]);
+title('Change in Power');
 temp = gca;
 temp.FontSize = fontsize;
 temp.TickDir = tickdir;
 temp.TickLength = ticklength;
 %ylabel('Means of Cross-Correlations')
 %legend('p < 0.05', 'p >= 0.05', 'x=y line', 'location', 'best');
-fig2 = subplot(4,2,2);
-G = [ones(size(DPSDselfCorr))  2*ones(size(DPSDcrossCorrFlat))];
-X = [DPSDselfCorr, DPSDcrossCorrFlat];
-b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
-set(b, {'linew'}, {1});
-h = findobj(gca,'Tag','Box');
-colors = [0 0 0; 0 0 0]/255;
-for j=1:length(h)
-    patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
-end
-xticks([]);
-xticklabels([]);
-ylim([-1 1.1])
-yticks([-1 -0.5 0 0.5 1]);
-yticklabels([-1 -0.5 0 0.5 1]);
-temp = gca;
-temp.FontSize = fontsize;
-temp.TickDir = tickdir;
-temp.TickLength = ticklength;
-% disp('right tailed ttest comparing self correlation and cross correlations of change in power')
-% [h,p] = ttest2(DPSDselfCorr,DPSDcrossCorrFlat,'Tail', 'right')
+%% boxplots
+% fig2 = subplot(4,2,2);
+% G = [ones(size(DPSDselfCorr))  2*ones(size(DPSDcrossCorrFlat))];
+% X = [DPSDselfCorr, DPSDcrossCorrFlat];
+% b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
+% set(b, {'linew'}, {1});
+% h = findobj(gca,'Tag','Box');
+% colors = [0 0 0; 0 0 0]/255;
+% for j=1:length(h)
+%     patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
+% end
+% xticks([]);
+% xticklabels([]);
+% ylim([-1 1.1])
+% yticks([-1 -0.5 0 0.5 1]);
+% yticklabels([-1 -0.5 0 0.5 1]);
+% temp = gca;
+% temp.FontSize = fontsize;
+% temp.TickDir = tickdir;
+% temp.TickLength = ticklength;
+% % disp('right tailed ttest comparing self correlation and cross correlations of change in power')
+% % [h,p] = ttest2(DPSDselfCorr,DPSDcrossCorrFlat,'Tail', 'right')
 disp('right tailed Mann  WHitney U test comparing self correlation and cross correlations of change in power')
 [p2,h2] = ranksum(DPSDselfCorr,DPSDcrossCorrFlat,'tail', 'right')
-SelfVsCross{1,:} = {median(DPSDselfCorr),iqr(DPSDselfCorr),median(DPSDcrossCorrFlat),iqr(DPSDcrossCorrFlat),p2};
+SelfVsCross{1,:} = {median(DPSDselfCorr),getSEMedian(DPSDselfCorr),median(DPSDcrossCorrFlat),getSEMedian(DPSDcrossCorrFlat),p2};
 %% Alpha Band Power vs Time
 
 alphaSelfCorr = [];
@@ -181,7 +188,7 @@ alphaCrossCorrMeans = median(alphaCrossCorr, 2);
 alphaCrossCorrFlat = reshape(alphaCrossCorr.', 1, []);
 
 
-fig3 = subplot(4,2,3);
+fig3 = subplot(2,2,2);
 for i=subjects
     scatter(fig3, repmat(alphaSelfCorr(i),1,iSub - 1),alphaCrossCorr(i,:),'k','filled','MarkerFaceColor','k','MarkerFaceAlpha',0.15)
     hold on
@@ -193,43 +200,46 @@ hold on;
 xlim([0 1]);
 ylim([0 1]);
 plot([0 1], [0 1],'color','#aa3700','linewidth',0.5);
-xticks([]);
-xticklabels([]);
+xticks([0,0.5,1]);
+xticklabels([0,0.5,1]);
+yticks([0,0.5,1]);
+yticklabels([0,0.5,1]);
 %xlabel('Self-Correlation');
-ylabel('Alpha');
+title('Alpha');
 temp = gca;
 temp.FontSize = fontsize;
 temp.TickDir = tickdir;
 temp.TickLength = ticklength;
 %legend('p < 0.05', 'p >= 0.05', 'x=y line', 'location', 'best');
-fig4 = subplot(4,2,4);
-G = [ones(size(alphaSelfCorr))  2*ones(size(alphaCrossCorrFlat))];
-X = [alphaSelfCorr, alphaCrossCorrFlat];
-b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
-set(b, {'linew'}, {1});
-h = findobj(gca,'Tag','Box');
-colors = [0 0 0; 0 0 0]/255;;
-for j=1:length(h)
-    patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
-end
+% %% boxplot
+% fig4 = subplot(4,2,4);
+% G = [ones(size(alphaSelfCorr))  2*ones(size(alphaCrossCorrFlat))];
+% X = [alphaSelfCorr, alphaCrossCorrFlat];
+% b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
+% set(b, {'linew'}, {1});
+% h = findobj(gca,'Tag','Box');
+% colors = [0 0 0; 0 0 0]/255;;
+% for j=1:length(h)
+%     patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
+% end
+% 
+% xticks([]);
+% xticklabels([]);
+% ylim([-1 1.1])
+% yticks([-1 -0.5 0 0.5 1]);
+% yticklabels([-1 -0.5 0 0.5 1]);
+% 
+% temp = gca;
+% temp.FontSize = fontsize;
+% temp.TickDir = tickdir;
+% temp.TickLength = ticklength;
+% 
 
 % disp('right tailed ttest comparing self correlation and cross correlations of alpha band power')
 % [h,p] = ttest2(alphaSelfCorr,alphaCrossCorrFlat,'Tail', 'right')
 disp('right tailed Mann  WHitney U test comparing self correlation and cross correlations of alpha band power')
 [p2,h2] = ranksum(alphaSelfCorr,alphaCrossCorrFlat,'tail', 'right')
-SelfVsCross{2,:} = {median(alphaSelfCorr),iqr(alphaSelfCorr),median(alphaCrossCorrFlat),iqr(alphaCrossCorrFlat),p2};
-
-xticks([]);
-xticklabels([]);
-ylim([-1 1.1])
-yticks([-1 -0.5 0 0.5 1]);
-yticklabels([-1 -0.5 0 0.5 1]);
-
-temp = gca;
-temp.FontSize = fontsize;
-temp.TickDir = tickdir;
-temp.TickLength = ticklength;
-
+SelfVsCross{2,:} = {median(alphaSelfCorr),getSEMedian(alphaSelfCorr),median(alphaCrossCorrFlat),getSEMedian(alphaCrossCorrFlat),p2};
 
 %% Slow Gamma Band Power vs Time
 
@@ -258,7 +268,7 @@ slowGammaCrossCorrMeans = median(slowGammaCrossCorr, 2);
 slowGammaCrossCorrFlat = reshape(slowGammaCrossCorr.', 1, []);
 
 
-fig5 = subplot(4,2,5);
+fig5 = subplot(2,2,3);
 for i=subjects
     scatter(fig5, repmat(slowGammaSelfCorr(i),1,iSub - 1),slowGammaCrossCorr(i,:),'k','filled','MarkerFaceColor','k','MarkerFaceAlpha',0.15)
     hold on
@@ -270,41 +280,49 @@ hold on;
 xlim([0 1]);
 ylim([0 1]);
 plot([0 1], [0 1],'color','#aa3700','linewidth',0.5);
-xticks([]);
-xticklabels([]);
+xticks([0,0.5,1]);
+xticklabels([0,0.5,1]);
+yticks([0,0.5,1]);
+yticklabels([0,0.5,1]);
 %xlabel('Self-Correlation');
-ylabel('Slow Gamma')
+title('Slow Gamma');
 temp = gca;
 temp.FontSize = fontsize;
 temp.TickDir = tickdir;
 temp.TickLength = ticklength;
+ylabel('Cross Correlation')
+xlabel('Self Correlation');
+
 %legend('p < 0.05', 'p >= 0.05', 'x=y line', 'location', 'best');
-fig6 = subplot(4,2,6);
-G = [ones(size(slowGammaSelfCorr))  2*ones(size(slowGammaCrossCorrFlat))];
-X = [slowGammaSelfCorr, slowGammaCrossCorrFlat];
-b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
-set(b, {'linew'}, {1});
-h = findobj(gca,'Tag','Box');
-colors = [0 0 0; 0 0 0]/255;
-for j=1:length(h)
-    patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
-end
+
+% %% boxplot
+% fig6 = subplot(4,2,6);
+% G = [ones(size(slowGammaSelfCorr))  2*ones(size(slowGammaCrossCorrFlat))];
+% X = [slowGammaSelfCorr, slowGammaCrossCorrFlat];
+% b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'cross-corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
+% set(b, {'linew'}, {1});
+% h = findobj(gca,'Tag','Box');
+% colors = [0 0 0; 0 0 0]/255;
+% for j=1:length(h)
+%     patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
+% end
+% 
+% xticks([]);
+% xticklabels([]);
+% ylim([-1 1.1])
+% yticks([-1 -0.5 0 0.5 1]);
+% yticklabels([-1 -0.5 0 0.5 1]);
+% 
+% temp = gca;
+% temp.FontSize = fontsize;
+% temp.TickDir = tickdir;
+% temp.TickLength = ticklength;
 % disp('right tailed ttest comparing self correlation and cross correlations of slow gamma band power')
 % [h,p] = ttest2(slowGammaSelfCorr,slowGammaCrossCorrFlat,'Tail', 'right')
 disp('right tailed Mann  WHitney U test comparing self correlation and cross correlations of slow gamma band power')
 [p2,h2] = ranksum(slowGammaSelfCorr,slowGammaCrossCorrFlat,'tail', 'right')
-SelfVsCross{3,:} = {median(slowGammaSelfCorr),iqr(slowGammaSelfCorr),median(slowGammaCrossCorrFlat),iqr(slowGammaCrossCorrFlat),p2};
+SelfVsCross{3,:} = {median(slowGammaSelfCorr),getSEMedian(slowGammaSelfCorr),median(slowGammaCrossCorrFlat),getSEMedian(slowGammaCrossCorrFlat),p2};
 
-xticks([]);
-xticklabels([]);
-ylim([-1 1.1])
-yticks([-1 -0.5 0 0.5 1]);
-yticklabels([-1 -0.5 0 0.5 1]);
-
-temp = gca;
-temp.FontSize = fontsize;
-temp.TickDir = tickdir;
-temp.TickLength = ticklength;
 %% Fast Gamma Band Power vs Time
 
 fastGammaSelfCorr = [];
@@ -332,7 +350,7 @@ fastGammaCrossCorrMeans = median(fastGammaCrossCorr, 2);
 fastGammaCrossCorrFlat = reshape(fastGammaCrossCorr.', 1, []);
 
 
-fig7 = subplot(4,2,7);
+fig7 = subplot(2,2,4);
 for i=subjects
     scatter(fig7, repmat(fastGammaSelfCorr(i),1,iSub - 1),fastGammaCrossCorr(i,:),'k','filled','MarkerFaceColor','k','MarkerFaceAlpha',0.15)
     hold on
@@ -344,42 +362,48 @@ hold on;
 xlim([0 1]);
 ylim([0 1]);
 plot([0 1], [0 1],'color','#aa3700','linewidth',0.5);
+xticks([0,0.5,1]);
+xticklabels([0,0.5,1]);
+yticks([0,0.5,1]);
+yticklabels([0,0.5,1]);
 %xlabel('Self-Correlation');
-ylabel({'Cross Correlation','Fast Gamma'})
-xlabel('Self Correlation');
 temp = gca;
 temp.FontSize = fontsize;
 temp.TickDir = tickdir;
 temp.TickLength = ticklength;
+title('Fast Gamma');
+
 %ylabel('Cross Correlation');
 
+% %% boxplot
+% fig8 = subplot(4,2,8);
+% G = [ones(size(fastGammaSelfCorr))  2*ones(size(fastGammaCrossCorrFlat))];
+% X = [fastGammaSelfCorr, fastGammaCrossCorrFlat];
+% b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'Cross-Corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
+% set(b, {'linew'}, {1});
+% h = findobj(gca,'Tag','Box');
+% colors = [0 0 0; 0 0 0]/255;
+% for j=1:length(h)
+%     patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
+% end
+% 
+% ylim([-1 1.1]);
+% yticks([-1 -0.5 0 0.5 1]);
+% yticklabels([-1 -0.5 0 0.5 1]);
+% ylabel('Correlation', 'Position', [0.072734082397004,-0.045980878908425,-1]);
+% temp = gca;
+% temp.FontSize = fontsize;
+% temp.TickDir = tickdir;
+% temp.TickLength = ticklength;
 
-fig8 = subplot(4,2,8);
-G = [ones(size(fastGammaSelfCorr))  2*ones(size(fastGammaCrossCorrFlat))];
-X = [fastGammaSelfCorr, fastGammaCrossCorrFlat];
-b = boxplot(X, G, 'notch', 'off', 'Labels', {'Self-Corr', 'Cross-Corr'},'Colors',[0 0 0; 0 0 0]/255,'symbol','.');
-set(b, {'linew'}, {1});
-h = findobj(gca,'Tag','Box');
-colors = [0 0 0; 0 0 0]/255;
-for j=1:length(h)
-    patch(get(h(j),'XData'),get(h(j),'YData'),colors(j,:),'FaceAlpha',0.3);
-end
 % disp('right tailed ttest comparing self correlation and cross correlations of fast gamma band power')
 % [h,p] = ttest2(fastGammaSelfCorr,fastGammaCrossCorrFlat,'Tail', 'right')
 disp('right tailed Mann  WHitney U test comparing self correlation and cross correlations of fast gamma band power')
 [p2,h2] = ranksum(fastGammaSelfCorr,fastGammaCrossCorrFlat,'tail', 'right')
-SelfVsCross{4,:} = {median(fastGammaSelfCorr),iqr(fastGammaSelfCorr),median(fastGammaCrossCorrFlat),iqr(fastGammaCrossCorrFlat),p2};
-
-ylim([-1 1.1]);
-yticks([-1 -0.5 0 0.5 1]);
-yticklabels([-1 -0.5 0 0.5 1]);
-ylabel('Correlation', 'Position', [0.072734082397004,-0.045980878908425,-1]);
-temp = gca;
-temp.FontSize = fontsize;
-temp.TickDir = tickdir;
-temp.TickLength = ticklength;
+SelfVsCross{4,:} = {median(fastGammaSelfCorr),getSEMedian(fastGammaSelfCorr),median(fastGammaCrossCorrFlat),getSEMedian(fastGammaCrossCorrFlat),p2};
 
 
-SelfVsCross.Properties.VariableNames = {'SelfMedian','SelfIQR','CrossMedian','CrossIQR','pval'};
+SelfVsCross.Properties.VariableNames = {'SelfMedian','SelfSE','CrossMedian','CrossSE','pval'};
 SelfVsCross.Properties.RowNames = {'PSD change','alpha','Sgamma','Fgamma'};
+format short;
 disp(SelfVsCross);

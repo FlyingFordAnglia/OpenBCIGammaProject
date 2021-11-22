@@ -42,7 +42,7 @@ end
 disp(['Mean number of trials per session per subject is ' num2str(mean(avgT))]);
 disp(['STD is ' num2str(std(avgT))]);
 
-%% mean band trials 
+%% mean bad trials 
 [subjectNames,expDates,protocolNames,stimTypes,deviceNames,capLayouts,gender] = allProtocolsOBCIGammaProject;
 allSubjects = unique(subjectNames);
 analyseTheseSubjects = [1:11];

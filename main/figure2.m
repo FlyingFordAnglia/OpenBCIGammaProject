@@ -19,10 +19,10 @@ tickdir = 'out';
 ticklength = [0.03 0];
 colorOBCI = '#aa3700';
 colorBP = '#0073aa';
-annotation('textbox', [0.052,0.91,0.04,0.045], 'String', "A", 'FontSize',12,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.60,0.91,0.04,0.045], 'String', "B", 'FontSize',12,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.052,0.38,0.04,0.045], 'String', "C", 'FontSize',12,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.60,0.38,0.04,0.045], 'String', "D", 'FontSize',12,'FontWeight','bold', 'EdgeColor','none')
+annotation('textbox', [0.052,0.91,0.04,0.045], 'String', "A", 'FontSize',12,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.60,0.91,0.04,0.045], 'String', "B", 'FontSize',12,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.052,0.38,0.04,0.045], 'String', "C", 'FontSize',12,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.60,0.38,0.04,0.045], 'String', "D", 'FontSize',12,'FontWeight','bold', 'EdgeColor','k')
 
 alphaRange = [8 13];
 slowGammaRange = [20 34];

@@ -1,8 +1,8 @@
 % This program needs allSubjectData struct obtained by running analyseAllData.m
 % Likewise for line noise filtered data.
 
-%analyseAllData;
-%analyseAllDataNoiseFiltered;
+% analyseAllData;
+% analyseAllDataNoiseFiltered;
 clearvars -except allSubjectDataNoiseFiltered allSubjectData
 % 
 [subjectNames,expDates,protocolNames,stimTypes,deviceNames,capLayouts,gender] = allProtocolsOBCIGammaProject;
@@ -27,10 +27,10 @@ BPSlope1AllSubjects = [];
 BPSlope2AllSubjects = [];
 colors = [170 55 0; 0 115 170]/255;
 figure('Position', [188.3333333333333,41.666666666666664,672,599.3333333333333],'Color',[1 1 1]);
-annotation('textbox', [0.068,0.93,0.04,0.045], 'String', "A", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.51,0.93,0.04,0.045], 'String', "B", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.068,0.48,0.04,0.045], 'String', "C", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','none')
-annotation('textbox', [0.51,0.48,0.04,0.045], 'String', "D", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','none')
+annotation('textbox', [0.068,0.93,0.04,0.045], 'String', "A", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.51,0.93,0.04,0.045], 'String', "B", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.068,0.48,0.04,0.045], 'String', "C", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
+annotation('textbox', [0.51,0.48,0.04,0.045], 'String', "D", 'FontSize',fontsize,'FontWeight','bold', 'EdgeColor','k')
 
 for iSub = 1:length(allSubjectData)
     x = protocolNames(contains(subjectNames,allSubjects(iSub)));
